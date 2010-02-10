@@ -15,6 +15,11 @@ class StripAllMockRecord < ActiveRecord::Base
   strip_attributes!
 end
 
+class StripAllMockLeaveBlankRecord < ActiveRecord::Base
+  include MockAttributes
+  strip_attributes! :leave_blank => true
+end
+
 class StripOnlyOneMockRecord < ActiveRecord::Base
   include MockAttributes
   strip_attributes! :only => :foo
@@ -52,6 +57,16 @@ class StripAttributesTest < Test::Unit::TestCase
     assert_equal "biz", record.biz
     assert_nil record.baz
     assert_nil record.bang
+  end
+
+  def test_should_strip_all_fields_but_leave_blank_attributes_blank
+    record = StripAllMockLeaveBlankRecord.new(@init_params)
+    record.valid?
+    assert_equal "foo", record.foo
+    assert_equal "bar", record.bar
+    assert_equal "biz", record.biz
+    assert_equal '', record.baz
+    assert_equal '', record.bang
   end
 
   def test_should_strip_only_one_field
